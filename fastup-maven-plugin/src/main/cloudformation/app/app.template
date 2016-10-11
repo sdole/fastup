@@ -1,0 +1,447 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "",
+  "Resources": {
+    "AppElb": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties": {
+        "LBCookieStickinessPolicy": [
+          {
+            "PolicyName": "StickyLb"
+          }
+        ],
+        "Subnets": {
+          "Ref": "ElbSubnetsParam"
+        },
+        "HealthCheck": {
+          "HealthyThreshold": "3",
+          "Interval": "5",
+          "Target": {
+            "Ref": "HealthCheckUrlParam"
+          },
+          "Timeout": "3",
+          "UnhealthyThreshold": "5"
+        },
+        "ConnectionDrainingPolicy": {
+          "Enabled": "true",
+          "Timeout": "300"
+        },
+        "ConnectionSettings": {
+          "IdleTimeout": "60"
+        },
+        "CrossZone": "true",
+        "SecurityGroups": [
+          {
+            "Ref": "ElbSecurityGroupParam"
+          }
+        ],
+        "Listeners": [
+          {
+            "InstancePort": "8080",
+            "LoadBalancerPort": "80",
+            "Protocol": "HTTP",
+            "InstanceProtocol": "HTTP",
+            "PolicyNames": [
+              "StickyLb"
+            ]
+          }
+        ]
+      }
+    },
+    "AppAutoScalingGroup": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "VPCZoneIdentifier": {
+          "Ref": "AppSubnetsParam"
+        },
+        "Cooldown": "300",
+        "DesiredCapacity": "0",
+        "HealthCheckGracePeriod": "300",
+        "HealthCheckType": "ELB",
+        "MaxSize": "6",
+        "MinSize": "0",
+        "LaunchConfigurationName": {
+          "Ref": "AppLaunchConfiguration"
+        },
+        "LoadBalancerNames": [
+          {
+            "Ref": "AppElb"
+          }
+        ],
+        "TerminationPolicies": [
+          "Default"
+        ]
+      }
+    },
+    "AppLaunchConfiguration": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "ImageId": "ami-f3d998e4",
+        "InstanceType": "t2.micro",
+        "KeyName": "trelair",
+        "IamInstanceProfile": {
+          "Ref": "AppInstanceProfileParam"
+        },
+        "SecurityGroups": [
+          {
+            "Ref": "AppSecurityGroupParam"
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/xvda",
+            "Ebs": {
+              "VolumeSize": 8
+            }
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -v\n",
+                "/usr/local/bin/cfn-init -v -s ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                " --role ",
+                {
+                  "Ref": "AppSetupRoleParam"
+                },
+                " -r ",
+                " AppLaunchConfiguration ",
+                " -c ",
+                " main ",
+                "\n",
+                "/usr/local/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource AppLaunchConfiguration ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Authentication": {
+          "S3AccessCreds": {
+            "type": "S3",
+            "buckets": [
+              {
+                "Ref": "ArtifactBucketNameParam"
+              }
+            ],
+            "roleName": {
+              "Ref": "AppSetupRoleParam"
+            }
+          }
+        },
+        "AWS::CloudFormation::Init": {
+          "configSets": {
+            "main": [
+              "downloadWar",
+              "startTomcat"
+            ]
+          },
+          "downloadWar": {
+            "files": {
+              "/var/lib/tomcat8/webapps/tvarit.war": {
+                "source": {
+                  "Ref": "WarFileUrlParam"
+                },
+                "owner": "tomcat",
+                "group": "tomcat",
+                "mode": "000755",
+                "authentication": "S3AccessCreds"
+              },
+              "/tmp/replace_jdbc.sh": {
+                "source": {
+                  "Ref": "JdbcSetupShParam"
+                },
+                "owner": "root",
+                "group": "root",
+                "mode": "000700",
+                "authentication": "S3AccessCreds"
+              },
+              "/opt/tomcat/conf/Catalina/localhost/web_app.xml": {
+                "source": {
+                  "Ref": "AppConfigXmlUrlParam"
+                },
+                "owner": "tomcat",
+                "group": "tomcat",
+                "mode": "000644",
+                "authentication": "S3AccessCreds"
+              }
+            }
+          },
+          "startTomcat": {
+            "commands": {
+              "0010": {
+                "command": [
+                  "sed",
+                  "-i",
+                  "s/\\r//g",
+                  "/opt/tomcat/conf/Catalina/localhost/web_app.xml"
+                ]
+              },
+              "0020": {
+                "command": [
+                  "sed",
+                  "-i",
+                  "s/\\r//g",
+                  "/tmp/replace_jdbc.sh"
+                ]
+              },
+              "0100": {
+                "command": [
+                  "/tmp/replace_jdbc.sh",
+                  "DB_HOST",
+                  {
+                    "Ref": "DbHostParam"
+                  },
+                  "/opt/tomcat/conf/Catalina/localhost/web_app.xml"
+                ]
+              },
+              "0200": {
+                "command": [
+                  "/tmp/replace_jdbc.sh",
+                  "DB_USERNAME",
+                  {
+                    "Ref": "DbUsernameParam"
+                  },
+                  "/opt/tomcat/conf/Catalina/localhost/web_app.xml"
+                ]
+              },
+              "0300": {
+                "command": [
+                  "/tmp/replace_jdbc.sh",
+                  "DB_PASSWORD",
+                  {
+                    "Ref": "DbPasswordParam"
+                  },
+                  "/opt/tomcat/conf/Catalina/localhost/web_app.xml"
+                ]
+              },
+              "0400": {
+                "command": [
+                  "/tmp/replace_jdbc.sh",
+                  "DB_NAME",
+                  {
+                    "Ref": "DbNameParam"
+                  },
+                  "/opt/tomcat/conf/Catalina/localhost/web_app.xml"
+                ]
+              },
+              "0500": {
+                "command": [
+                  "mv",
+                  "/opt/tomcat/conf/Catalina/localhost/web_app.xml",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "/opt/tomcat/conf/Catalina/localhost/",
+                        {
+                          "Ref": "ContextRootParam"
+                        },
+                        ".xml"
+                      ]
+                    ]
+                  }
+                ]
+              },
+              "0600": {
+                "command": [
+                  "rm",
+                  "/tmp/replace_jdbc.sh"
+                ]
+              },
+              "0700": {
+                "command": [
+                  "systemctl",
+                  "start",
+                  "tomcat"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "ScalingPolicyDecreaseSize": {
+      "Type": "AWS::AutoScaling::ScalingPolicy",
+      "Properties": {
+        "AdjustmentType": "ChangeInCapacity",
+        "ScalingAdjustment": "-1",
+        "AutoScalingGroupName": {
+          "Ref": "AppAutoScalingGroup"
+        }
+      }
+    },
+    "ScalingPolicyIncreaseSize": {
+      "Type": "AWS::AutoScaling::ScalingPolicy",
+      "Properties": {
+        "AdjustmentType": "ChangeInCapacity",
+        "ScalingAdjustment": "1",
+        "AutoScalingGroupName": {
+          "Ref": "AppAutoScalingGroup"
+        }
+      }
+    },
+    "HighCpuAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "ActionsEnabled": "true",
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "EvaluationPeriods": "1",
+        "MetricName": "CPUUtilization",
+        "Namespace": "AWS/EC2",
+        "Period": "300",
+        "Statistic": "Average",
+        "Threshold": "70.0",
+        "AlarmActions": [
+          {
+            "Ref": "ScalingPolicyIncreaseSize"
+          }
+        ],
+        "Dimensions": [
+          {
+            "Name": "AutoScalingGroupName",
+            "Value": "tvaritAutoScalingGroup"
+          }
+        ]
+      }
+    },
+    "LowCpuAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "ActionsEnabled": "true",
+        "ComparisonOperator": "LessThanOrEqualToThreshold",
+        "EvaluationPeriods": "1",
+        "MetricName": "CPUUtilization",
+        "Namespace": "AWS/EC2",
+        "Period": "300",
+        "Statistic": "Average",
+        "Threshold": "20.0",
+        "AlarmActions": [
+          {
+            "Ref": "ScalingPolicyDecreaseSize"
+          }
+        ],
+        "Dimensions": [
+          {
+            "Name": "AutoScalingGroupName",
+            "Value": "tvaritAutoScalingGroup"
+          }
+        ]
+      }
+    },
+    "AppCname": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "Type": "A",
+        "AliasTarget": {
+          "HostedZoneId": {
+            "Fn::GetAtt": [
+              "AppElb",
+              "CanonicalHostedZoneNameID"
+            ]
+          },
+          "DNSName": {
+            "Fn::GetAtt": [
+              "AppElb",
+              "DNSName"
+            ]
+          }
+        },
+        "Name": {
+          "Ref": "AppDnsNameParam"
+        },
+        "HostedZoneName": {
+          "Ref": "DomainNameHostedZoneNameParam"
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "AppInstanceProfileParam": {
+      "Type": "String",
+      "Description": "The IAM role that will be used for all tvarit instances."
+    },
+    "AvailabilityZonesParam": {
+      "Type": "CommaDelimitedList",
+      "Description": "Enter exactly 2 availability zone ids where the ELBs and app servers will be deployed."
+    },
+    "AppSecurityGroupParam": {
+      "Type": "String",
+      "Description": "The security group to be used for the app."
+    },
+    "ElbSubnetsParam": {
+      "Type": "CommaDelimitedList",
+      "Description": "Enter exactly 2 subnet ids that are publicly accessible. ELBs will be placed in these two subnets."
+    },
+    "AppSubnetsParam": {
+      "Type": "CommaDelimitedList",
+      "Description": "Enter exactly 2 subnet ids where app instances will be launched."
+    },
+    "HealthCheckUrlParam": {
+      "Type": "String",
+      "Description": "Enter the health check absolute url for the app servers. "
+    },
+    "ElbSecurityGroupParam": {
+      "Type": "String",
+      "Description": "Enter the health check absolute url for the app servers. "
+    },
+    "ArtifactBucketNameParam": {
+      "Type": "String",
+      "Description": "The bucket name where deployable artifacts are saved."
+    },
+    "AppSetupRoleParam": {
+      "Type": "String",
+      "Description": "The role that will be used to provision instances"
+    },
+    "WarFileUrlParam": {
+      "Type": "String",
+      "Description": "The S3 url of the war file"
+    },
+    "AppConfigXmlUrlParam": {
+      "Type": "String"
+    },
+    "ContextRootParam": {
+      "Type": "String"
+    },
+    "AppDnsNameParam": {
+      "Type": "String"
+    },
+    "DomainNameHostedZoneNameParam": {
+      "Type": "String"
+    },
+    "DbHostParam": {
+      "Type": "String"
+    },
+    "DbUsernameParam": {
+      "Type": "String"
+    },
+    "DbPasswordParam": {
+      "Type": "String"
+    },
+    "DbNameParam": {
+      "Type": "String"
+    },
+    "JdbcSetupShParam": {
+      "Type": "String"
+    }
+  }
+}

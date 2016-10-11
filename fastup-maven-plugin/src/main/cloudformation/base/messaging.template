@@ -1,0 +1,43 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "",
+  "Resources": {
+    "RdsDeployedSqsQueue": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "VisibilityTimeout": "300"
+      }
+    },
+    "ProvisioningDoneNotificationTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "Subscription": [
+          {
+            "Endpoint": {
+              "Ref": "AppDeployerLambdaFunctionArnParm"
+            },
+            "Protocol": "lambda"
+          }
+        ]
+      }
+    }
+  },
+  "Parameters": {
+    "AppDeployerLambdaFunctionArnParm": {
+      "Description": "The arn of the lambda function that will deploy the app",
+      "Type": "String"
+    }
+  },
+  "Outputs": {
+    "RdsDeployedSnsTopicOutput": {
+      "Value": {
+        "Ref": "ProvisioningDoneNotificationTopic"
+      }
+    },
+    "RdsAlreadyDeployedSqsTopicOutput": {
+      "Value": {
+        "Ref": "RdsDeployedSqsQueue"
+      }
+    }
+  }
+}
