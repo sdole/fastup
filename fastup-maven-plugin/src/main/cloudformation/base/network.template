@@ -1,0 +1,1008 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "TvaritVpc": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "InstanceTenancy": "default",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  "-vpc"
+                ]
+              ]
+            }
+          },
+          {
+            "Key": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  ":vpc"
+                ]
+              ]
+            },
+            "Value": ""
+          }
+        ]
+      }
+    },
+    "AppSubnetA": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.120.0/24",
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        },
+        "MapPublicIpOnLaunch": false,
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Ref": "AvailabilityZones"
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  ":app"
+                ]
+              ]
+            },
+            "Value": ""
+          },
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  "-app-a"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "AppSubnetB": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.220.0/24",
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        },
+        "MapPublicIpOnLaunch": false,
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Ref": "AvailabilityZones"
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  ":app"
+                ]
+              ]
+            },
+            "Value": ""
+          },
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  "-app-b"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "DbSubnetA": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.10.0/24",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Ref": "AvailabilityZones"
+            }
+          ]
+        },
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  "-db-a"
+                ]
+              ]
+            }
+          },
+          {
+            "Key": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  ":db"
+                ]
+              ]
+            },
+            "Value": ""
+          }
+        ]
+      }
+    },
+    "DbSubnetB": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.20.0/24",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Ref": "AvailabilityZones"
+            }
+          ]
+        },
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        },
+        "Tags": [
+          {
+            "Key": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  ":db"
+                ]
+              ]
+            },
+            "Value": ""
+          },
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  "-db-b"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "PublicSubnetA": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.1.0/24",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Ref": "AvailabilityZones"
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": true,
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  "-pub-a"
+                ]
+              ]
+            }
+          },
+          {
+            "Key": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  ":appSubnet"
+                ]
+              ]
+            },
+            "Value": ""
+          }
+        ]
+      }
+    },
+    "PublicSubnetB": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.2.0/24",
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Ref": "AvailabilityZones"
+            }
+          ]
+        },
+        "MapPublicIpOnLaunch": true,
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        },
+        "Tags": [
+          {
+            "Key": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  ":appSubnet"
+                ]
+              ]
+            },
+            "Value": ""
+          },
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  "-pub-b"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "AppSubnetRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  "-app-internet-rt"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "DbSubnetRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  "-db-internet-rt"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "PubSubnetRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  "-pub-internet-rt"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "AppSubnetARouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "AppSubnetRouteTable"
+        },
+        "SubnetId": {
+          "Ref": "AppSubnetA"
+        }
+      }
+    },
+    "AppSubnetBRouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "AppSubnetRouteTable"
+        },
+        "SubnetId": {
+          "Ref": "AppSubnetB"
+        }
+      }
+    },
+    "DbSubnetARouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "DbSubnetRouteTable"
+        },
+        "SubnetId": {
+          "Ref": "DbSubnetA"
+        }
+      }
+    },
+    "DbSubnetBRouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "DbSubnetRouteTable"
+        },
+        "SubnetId": {
+          "Ref": "DbSubnetB"
+        }
+      }
+    },
+    "PubSubnetARouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PubSubnetRouteTable"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnetA"
+        }
+      }
+    },
+    "PubSubnetBRouteTableAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "PubSubnetRouteTable"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnetB"
+        }
+      }
+    },
+    "AppSubnetAToNatGatewayRoute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "AppSubnetRouteTable"
+        },
+        "NatGatewayId": {
+          "Ref": "NatGatewayA"
+        }
+      }
+    },
+    "PubSubnetAToNatGatewayRoute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "PubSubnetRouteTable"
+        },
+        "GatewayId": {
+          "Ref": "IgForVpc"
+        }
+      }
+    },
+    "DbSubnetBToNatRoute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "DbSubnetRouteTable"
+        },
+        "NatGatewayId": {
+          "Ref": "NatGatewayA"
+        }
+      }
+    },
+    "DbSubnetGroup": {
+      "Type": "AWS::RDS::DBSubnetGroup",
+      "Properties": {
+        "DBSubnetGroupDescription": "A subnet group for high availability app database.",
+        "SubnetIds": [
+          {
+            "Ref": "DbSubnetA"
+          },
+          {
+            "Ref": "DbSubnetB"
+          }
+        ]
+      }
+    },
+    "IgForVpc": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  "-ig"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "TvaritVpcDhcpOpts": {
+      "Type": "AWS::EC2::DHCPOptions",
+      "Properties": {
+        "DomainName": "ec2.internal",
+        "DomainNameServers": [
+          "AmazonProvidedDNS"
+        ]
+      }
+    },
+    "DefaultTvaritVpcNacl": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        }
+      }
+    },
+    "TvaritVpcDefaultRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        }
+      }
+    },
+    "NaclDefaultRule1": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "DefaultTvaritVpcNacl"
+        }
+      }
+    },
+    "NaclDefaultRule2": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "DefaultTvaritVpcNacl"
+        }
+      }
+    },
+    "DefaultNaclToAppSubnetBAssociation": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "DefaultTvaritVpcNacl"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnetB"
+        }
+      }
+    },
+    "DefaultNaclToDbSubnetBAssociation": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "DefaultTvaritVpcNacl"
+        },
+        "SubnetId": {
+          "Ref": "DbSubnetB"
+        }
+      }
+    },
+    "DefaultNaclToDbSubnetAAssociation": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "DefaultTvaritVpcNacl"
+        },
+        "SubnetId": {
+          "Ref": "DbSubnetA"
+        }
+      }
+    },
+    "DefaultNaclToAppSubnetAAssociation": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "DefaultTvaritVpcNacl"
+        },
+        "SubnetId": {
+          "Ref": "PublicSubnetA"
+        }
+      }
+    },
+    "IgAttachedtoVpc": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        },
+        "InternetGatewayId": {
+          "Ref": "IgForVpc"
+        }
+      }
+    },
+    "IpForNatA": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "IpForNatB": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "NatGatewayA": {
+      "DependsOn": [
+        "IgAttachedtoVpc"
+      ],
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnetA"
+        },
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "IpForNatA",
+            "AllocationId"
+          ]
+        }
+      }
+    },
+    "NatGatewayB": {
+      "DependsOn": [
+        "IgAttachedtoVpc"
+      ],
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "PublicSubnetB"
+        },
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "IpForNatB",
+            "AllocationId"
+          ]
+        }
+      }
+    },
+    "S3Endpoint": {
+      "Type": "AWS::EC2::VPCEndpoint",
+      "Properties": {
+        "RouteTableIds": [
+          {
+            "Ref": "AppSubnetRouteTable"
+          },
+          {
+            "Ref": "DbSubnetRouteTable"
+          }
+        ],
+        "ServiceName": {
+          "Fn::Join": [
+            "",
+            [
+              "com.amazonaws.",
+              {
+                "Ref": "AWS::Region"
+              },
+              ".s3"
+            ]
+          ]
+        },
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        }
+      }
+    },
+    "dhcpAssociation": {
+      "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
+      "Properties": {
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        },
+        "DhcpOptionsId": {
+          "Ref": "TvaritVpcDhcpOpts"
+        }
+      }
+    },
+    "SgDefault": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "default VPC security group",
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        },
+        "Tags": [
+          {
+            "Key": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "ProjectNameParm"
+                  },
+                  ":appSg"
+                ]
+              ]
+            },
+            "Value": ""
+          }
+        ]
+      }
+    },
+    "defaultSgInRule": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "SgDefault"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "SgDefault"
+        },
+        "SourceSecurityGroupOwnerId": {
+          "Ref": "AWS::AccountId"
+        }
+      }
+    },
+    "defaultSgOutRule": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "SgDefault"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "ElbSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "80",
+            "ToPort": "80",
+            "IpProtocol": "tcp"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "443",
+            "ToPort": "443",
+            "IpProtocol": "tcp"
+          }
+        ],
+        "GroupDescription": "For elbs to be allowed http access from www",
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        }
+      }
+    },
+    "AppSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "SecurityGroupIngress": [
+          {
+            "SourceSecurityGroupId": {
+              "Ref": "ElbSecurityGroup"
+            },
+            "FromPort": "8080",
+            "ToPort": "8080",
+            "IpProtocol": "tcp"
+          },
+          {
+            "SourceSecurityGroupId": {
+              "Ref": "ElbSecurityGroup"
+            },
+            "FromPort": "8443",
+            "ToPort": "8443",
+            "IpProtocol": "tcp"
+          },
+          {
+            "SourceSecurityGroupId": {
+              "Ref": "BastionSecurityGroup"
+            },
+            "FromPort": "22",
+            "ToPort": "22",
+            "IpProtocol": "tcp"
+          }
+        ],
+        "GroupDescription": "For app servers to be allowed http access from www",
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        }
+      }
+    },
+    "DbSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "SecurityGroupIngress": [
+          {
+            "SourceSecurityGroupId": {
+              "Ref": "AppSecurityGroup"
+            },
+            "FromPort": "5432",
+            "ToPort": "5432",
+            "IpProtocol": "tcp"
+          },
+          {
+            "SourceSecurityGroupId": {
+              "Ref": "BastionSecurityGroup"
+            },
+            "FromPort": "5432",
+            "ToPort": "5432",
+            "IpProtocol": "tcp"
+          }
+        ],
+        "GroupDescription": "For db to be allowed access from bastion and from app.",
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        }
+      }
+    },
+    "BastionSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "22",
+            "ToPort": "22",
+            "IpProtocol": "tcp"
+          }
+        ],
+        "GroupDescription": "For bastion host to allow ssh access from www",
+        "VpcId": {
+          "Ref": "TvaritVpc"
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "AvailabilityZones": {
+      "Type": "CommaDelimitedList",
+      "Description": "Enter exactly 2 availability zone ids where the ELBs and app servers will be deployed. e.g. us-east-1a"
+    },
+    "ProjectNameParm": {
+      "Type": "String",
+      "Description": "Enter a name for your project. This will be used as part of resource names and tags.",
+      "AllowedPattern": "[a-zA-Z][-a-zA-Z0-9]*",
+      "MinLength": "1"
+    }
+  },
+  "Outputs": {
+    "TvaritVpcIdOutput": {
+      "Description": "The vpc created for Tvarit",
+      "Value": {
+        "Ref": "TvaritVpc"
+      }
+    },
+    "ElbSecurityGroupOutput": {
+      "Description": "The security groups subnets for elb",
+      "Value": {
+        "Ref": "ElbSecurityGroup"
+      }
+    },
+    "BastionSecurityGroupOutput": {
+      "Description": "The security groups subnets for bastion",
+      "Value": {
+        "Ref": "BastionSecurityGroup"
+      }
+    },
+    "AppSecurityGroupOutput": {
+      "Description": "The security groups subnets for apps",
+      "Value": {
+        "Ref": "AppSecurityGroup"
+      }
+    },
+    "DbSecurityGroupOutput": {
+      "Description": "The security groups subnets for db",
+      "Value": {
+        "Ref": "DbSecurityGroup"
+      }
+    },
+    "DbSubnetGroupOutput": {
+      "Description": "The subnet group for for database",
+      "Value": {
+        "Ref": "DbSubnetGroup"
+      }
+    },
+    "ElbSubnetsOutput": {
+      "Description": "The two subnets for elbs",
+      "Value": {
+        "Fn::Join": [
+          ",",
+          [
+            {
+              "Ref": "PublicSubnetA"
+            },
+            {
+              "Ref": "PublicSubnetB"
+            }
+          ]
+        ]
+      }
+    },
+    "AvailabilityZonesOutput": {
+      "Description": "The two availability zones for elbs",
+      "Value": {
+        "Fn::Join": [
+          ",",
+          [
+            {
+              "Fn::GetAtt": [
+                "AppSubnetA",
+                "AvailabilityZone"
+              ]
+            },
+            {
+              "Fn::GetAtt": [
+                "AppSubnetB",
+                "AvailabilityZone"
+              ]
+            }
+          ]
+        ]
+      }
+    },
+    "DeployerLambdaFunctionSecurityGroupsOutput": {
+      "Description": "The security group for lamdba function",
+      "Value": {
+        "Ref": "SgDefault"
+      }
+    },
+    "DeployerLambdaFunctionSubnetIdsOutput": {
+      "Description": "The subnet ids for lamdba function",
+      "Value": {
+        "Fn::Join": [
+          ",",
+          [
+            {
+              "Ref": "AppSubnetA"
+            },
+            {
+              "Ref": "AppSubnetB"
+            }
+          ]
+        ]
+      }
+    },
+    "AppSubnetsOutput": {
+      "Description": "Subnets where apps will be launched",
+      "Value": {
+        "Fn::Join": [
+          ",",
+          [
+            {
+              "Ref": "AppSubnetA"
+            },
+            {
+              "Ref": "AppSubnetB"
+            }
+          ]
+        ]
+      }
+    }
+  },
+  "Description": ""
+}

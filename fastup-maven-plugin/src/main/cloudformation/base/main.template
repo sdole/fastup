@@ -1,0 +1,254 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "",
+  "Resources": {
+    "IAM": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Ref": "IamTemplateUrl"
+        }
+      }
+    },
+    "SnsTopics": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Ref": "MessagingTemplateUrl"
+        },
+        "Parameters": {
+          "AppDeployerLambdaFunctionArnParm": {
+            "Fn::GetAtt": [
+              "DeployerLambda",
+              "Outputs.AppDeployerLambdaFunctionArnOutput"
+            ]
+          }
+        }
+      }
+    },
+    "Network": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Ref": "NetworkTemplateUrl"
+        },
+        "Parameters": {
+          "ProjectNameParm": {
+            "Ref": "ProjectNameParm"
+          },
+          "AvailabilityZones": {
+            "Fn::Join": [
+              ",",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Ref": "AvailabilityZones"
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Ref": "AvailabilityZones"
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "Router": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Ref": "RouterTemplateUrl"
+        },
+        "Parameters": {
+          "VpcId": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.TvaritVpcIdOutput"
+            ]
+          },
+          "RouterSubnets": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.ElbSubnetsOutput"
+            ]
+          },
+          "ProjectName": {
+            "Ref": "ProjectNameParm"
+          },
+          "SshKeyPairName": {
+            "Ref": "SshKeyPairName"
+          },
+          "ElbHealthCheckAbsoluteUrl": {
+            "Ref": "ElbHealthCheckUrl"
+          }
+        }
+      }
+    },
+    "DeployerLambda": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Ref": "DeployerLambdaTemplateUrl"
+        },
+        "Parameters": {
+          "LambdaFunctionExecutionRoleParam": {
+            "Fn::GetAtt": [
+              "IAM",
+              "Outputs.LambdaExecutionRoleOutput"
+            ]
+          },
+          "DeployerLambdaFunctionCodeS3BucketParam": {
+            "Ref": "DeployerLambdaFunctionCodeS3BucketParam"
+          },
+          "DeployerLambdaFunctionCodeS3KeyParam": {
+            "Ref": "DeployerLambdaFunctionCodeS3KeyParam"
+          },
+          "DeployerLambdaFunctionSecurityGroupsParam": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.DeployerLambdaFunctionSecurityGroupsOutput"
+            ]
+          },
+          "DeployerLambdaFunctionSubnetIdsParam": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.DeployerLambdaFunctionSubnetIdsOutput"
+            ]
+          }
+        }
+      }
+    },
+    "TvaritArtifactBucket": {
+      "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": "DeployerLambda",
+      "Properties": {
+        "TemplateURL": {
+          "Ref": "TvaritArtifactBucketTemplateUrl"
+        },
+        "Parameters": {
+          "ProjectNameParm": {
+            "Ref": "ProjectNameParm"
+          },
+          "ArtifactBucketNameParm": {
+            "Ref": "ArtifactBucketNameParm"
+          },
+          "DeployerLambdaFunctionArnParm": {
+            "Fn::GetAtt": [
+              "DeployerLambda",
+              "Outputs.RdsDeployerLambdaFunctionArnOutput"
+            ]
+          }
+        }
+      }
+    },
+    "BastionHost": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Ref": "BastionHostTemplateUrlParam"
+        },
+        "Parameters": {
+          "PubSubnetsParam": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.ElbSubnetsOutput"
+            ]
+          },
+          "BastionSecurityGroupParam": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.BastionSecurityGroupOutput"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "NetworkTemplateUrl": {
+      "Type": "String",
+      "Description": "The URL to the cloudformation template describing all network assets.",
+      "MinLength": "1"
+    },
+    "BastionHostTemplateUrlParam": {
+      "Type": "String",
+      "MinLength": "1"
+    },
+    "TvaritArtifactBucketTemplateUrl": {
+      "Type": "String",
+      "Description": "The URL to the cloudformation template describing the Tvarit Artifact Bucket",
+      "MinLength": "1"
+    },
+    "IamTemplateUrl": {
+      "Type": "String",
+      "Description": "The URL to the cloudformation template describing all IAM assets.",
+      "MinLength": "1"
+    },
+    "DeployerLambdaTemplateUrl": {
+      "Type": "String",
+      "Description": "The URL to the cloudformation template describing the deployer lambda function.",
+      "MinLength": "1"
+    },
+    "RouterTemplateUrl": {
+      "Type": "String",
+      "Description": "The URL to the cloudformation template describing the reverse proxy router and its autoscaling config.",
+      "MinLength": "1"
+    },
+    "MessagingTemplateUrl": {
+      "Type": "String",
+      "Description": "The URL to the cloudformation template describing the sns topics to be used for automation purposes.",
+      "MinLength": "1"
+    },
+    "AvailabilityZones": {
+      "Type": "List<AWS::EC2::AvailabilityZone::Name>",
+      "Description": "Enter exactly 2 availability zone ids where the ELBs and app servers will be deployed. e.g. us-east-1a"
+    },
+    "ProjectNameParm": {
+      "Type": "String",
+      "Description": "Enter a name for your project. This will be used as part of resource names and tags.",
+      "AllowedPattern": "[a-zA-Z][-a-zA-Z0-9]*",
+      "MinLength": "1"
+    },
+    "ArtifactBucketNameParm": {
+      "Type": "String",
+      "Description": "Enter a name for a new S3 bucket where that will be created for deployment via tvarit.",
+      "MinLength": "1"
+    },
+    "ElbHealthCheckUrl": {
+      "Type": "String",
+      "Description": "Enter a url to the router reverse proxy that indicates an instance's health"
+    },
+    "SshKeyPairName": {
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "Description": "The key pair name that can be used for logging on to the router instances."
+    },
+    "DeployerLambdaFunctionCodeS3KeyParam": {
+      "Type": "String",
+      "Description": "The key name where the rds deployer lambda function code is stored/uploaded."
+    },
+    "DeployerLambdaFunctionCodeS3BucketParam": {
+      "Type": "String",
+      "Description": "The bucket name where the rds deployer lambda function code is stored/uploaded."
+    }
+  },
+  "Outputs": {
+    "ReverseProxyRouterAutoScalingGroupName": {
+      "Description": "Reverse proxy router asg name",
+      "Value": {
+        "Fn::GetAtt": [
+          "Router",
+          "Outputs.ReverseProxyRouterAutoScalingGroupName"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,304 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "",
+  "Resources": {
+    "AppInstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "AppInstanceRole"
+          }
+        ],
+        "Path": "/"
+      }
+    },
+    "AppInstanceRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2008-10-17",
+          "Statement": [
+            {
+              "Sid": "St1",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }
+      }
+    },
+    "AppInstanceRolePolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "tvarit_lambda_deployer_iam_policy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "St2",
+              "Action": [
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:ListBucket"
+              ],
+              "Resource": [
+                "arn:aws:s3:::tvarit-tvarit-tomcat-plugin-test/*"
+              ],
+              "Effect": "Allow"
+            },
+            {
+              "Sid": "St19",
+              "Action": [
+                "cloudformation:*"
+              ],
+              "Resource": [
+                "*"
+              ],
+              "Effect": "Allow"
+            },
+            {
+              "Sid": "St4",
+              "Action": [
+                "autoscaling:*"
+              ],
+              "Resource": [
+                "*"
+              ],
+              "Effect": "Allow"
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "AppInstanceRole"
+          }
+        ]
+      }
+    },
+    "LambdaFunctionExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2008-10-17",
+          "Statement": [
+            {
+              "Sid": "St5",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            },
+            {
+              "Sid": "St6",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            },
+            {
+              "Sid": "St7",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "vpc-flow-logs.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }
+      }
+    },
+    "LambdaFunctionExecutionRolePolicy": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "tvarit_lambda_deployer_iam_policy",
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "St8",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+                "cloudwatch:PutMetricAlarm"
+              ],
+              "Resource": "*",
+              "Effect": "Allow"
+            },
+            {
+              "Sid": "St9",
+              "Action": [
+                "route53:ListHostedZones",
+                "route53:ChangeResourceRecordSets",
+                "route53:GetChangeRequest",
+                "route53:GetChange"
+              ],
+              "Resource": "*",
+              "Effect": "Allow"
+            },
+            {
+              "Sid": "St10",
+              "Action": [
+                "elasticloadbalancing:CreateLoadBalancer",
+                "elasticloadbalancing:ModifyLoadBalancerAttributes",
+                "elasticloadbalancing:CreateLoadBalancerPolicy",
+                "elasticloadbalancing:ConfigureHealthCheck",
+                "elasticloadbalancing:SetLoadBalancerPoliciesOfListener",
+                "elasticloadbalancing:DescribeLoadBalancers"
+              ],
+              "Resource": [
+                "*"
+              ],
+              "Effect": "Allow"
+            },
+            {
+              "Sid": "St11",
+              "Action": [
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:ListBucket",
+                "s3:PutObject",
+                "s3:GetBucketLocation"
+              ],
+              "Resource": [
+                "arn:aws:s3:::tvarit-tvarit-tomcat-plugin-test/*"
+              ],
+              "Effect": "Allow"
+            },
+            {
+              "Sid": "St12",
+              "Action": [
+                "cloudformation:*"
+              ],
+              "Resource": [
+                "*"
+              ],
+              "Effect": "Allow"
+            },
+            {
+              "Sid": "St13",
+              "Action": [
+                "iam:PassRole",
+                "iam:ListInstanceProfiles",
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface",
+                "ec2:DescribeAccountAttributes"
+              ],
+              "Resource": [
+                "*"
+              ],
+              "Effect": "Allow"
+            },
+            {
+              "Sid": "St14",
+              "Action": [
+                "autoscaling:AttachInstances",
+                "autoscaling:CompleteLifecycleAction",
+                "autoscaling:CreateOrUpdateTags",
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:DescribeAutoScalingInstances",
+                "autoscaling:DescribeLaunchConfigurations",
+                "autoscaling:DetachInstances",
+                "autoscaling:EnterStandby",
+                "autoscaling:ExitStandby",
+                "autoscaling:PutScalingPolicy",
+                "autoscaling:ResumeProcesses",
+                "autoscaling:SetDesiredCapacity",
+                "autoscaling:SuspendProcesses",
+                "autoscaling:TerminateInstanceInAutoScalingGroup",
+                "autoscaling:DescribeTags",
+                "autoscaling:CreateLaunchConfiguration",
+                "autoscaling:CreateAutoScalingGroup",
+                "autoscaling:UpdateAutoScalingGroup"
+              ],
+              "Resource": [
+                "*"
+              ],
+              "Effect": "Allow"
+            },
+            {
+              "Sid": "St15",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": "arn:aws:logs:*:*:*",
+              "Effect": "Allow"
+            },
+            {
+              "Sid": "St16",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": "*",
+              "Effect": "Allow"
+            },
+            {
+              "Sid": "St17",
+              "Action": [
+                "rds:DescribeDBInstances",
+                "rds:CreateDBInstance"
+              ],
+              "Resource": "*",
+              "Effect": "Allow"
+            },
+            {
+              "Sid": "St18",
+              "Action": [
+                "sns:Publish"
+              ],
+              "Resource": "arn:aws:sns:us-east-1:085224677438:tvarit-base-infrastructure-SnsTopics*",
+              "Effect": "Allow"
+            }
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "LambdaFunctionExecutionRole"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "LambdaExecutionRoleOutput": {
+      "Description": "The IAM role that will be used to run lambda functions",
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaFunctionExecutionRole",
+          "Arn"
+        ]
+      }
+    },
+    "AppInstanceProfileOutput": {
+      "Description": "The instance profile that will be used on instances that deploy the app",
+      "Value": {
+        "Fn::GetAtt": [
+          "AppInstanceProfile",
+          "Arn"
+        ]
+      }
+    },
+    "AppSetupRoleOutput": {
+      "Description": "The role that will be used by cloudformation on new instances to set it up.",
+      "Value": {
+        "Fn::GetAtt": [
+          "AppInstanceRole",
+          "Arn"
+        ]
+      }
+    }
+  }
+}
