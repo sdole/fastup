@@ -69,7 +69,8 @@ The `make-base-infrastructure` maven goal creates all required infrastructure re
 ### Purpose
 The `deploy-app` maven goal uploads the war file created in the standard maven deploy phase to the artifact bucket in S3. S3 triggers an event that executes a lambda function that deploys the uploaded war file.
 ### Configuration options
-Some of these configuration options are stored as metadata on the S3 object that this plugin creates. 
+Some of these configuration options are stored as metadata on the S3 object that this plugin creates.
+ 
 |Option                         |Required/Default   |Valid values                                                                       |Purpose                                                                         |
 |------------------------------ |------------       |--------------------------------------                                             |--------------------------------------------------------------------------------|
 |availability-zones             |                   |Comma separated availability zone names from AWS. Examples: us-east-1a,us-east-1b  |FastUp creates a new all subnets in the provided availability zones.|
@@ -110,6 +111,7 @@ FastUp is completely native to AWS. All constructs and concepts used within Fast
 
 ## Network template
 The network template describes all network infrastructure required for FastUp. In addition to network and vpc resources, this template also describes a bastion host that allows users to ssh into other resources. The following parameters are accepted in order to customize creation of network resources.
+
 |Parameter Name                     |Valid Values                               |Purpose                                                        |
 |-------                            |--------                                   |---------------                                                |
 |AvailabilityZones                  |AWS availability zones separated by comma  |Network resources will be created in these availability zones  |
@@ -117,6 +119,7 @@ The network template describes all network infrastructure required for FastUp. I
 
 ## Bastion template
 The bastion template describes one EC2 instance in a public subnet. Once deployed, users can get interactive access to the OS prompt using an SSH client of their choice. This instance is placed inside an autoscaling group with maximum size and minimum size both equal to 1. 
+
 |Parameter Name                     |Valid Values                               |Purpose                                                        |
 |-------                            |--------                                   |---------------                                                |
 |BastionSecurityGroupParam          |Valid security group. Should allow SSH.    |This will be applied to the bastion host.                      |
@@ -124,6 +127,7 @@ The bastion template describes one EC2 instance in a public subnet. Once deploye
 
 ## Artifact Bucket template
 The artifact bucket template describes a single bucket where FastUp uploads deployable files. It also describes an event that is triggered each time a deployable is uploaded into the bucket. 
+
 |Parameter Name                     |Valid Values                               |Purpose                                                        |
 |-------                            |--------                                   |---------------                                                |
 |DeployerLambdaFunctionArnParm      |A valid lambda function ARN.               |When a deployable artifact is uploaded, this lambda function is executed.                      |
@@ -135,12 +139,14 @@ The IAM template describes IAM roles and policies as execution roles for lambda 
 
 ## Messaging template
 The messaging template describes SNS topics that can be used for notifications as well as for triggering lambda functions.
+
 |Parameter Name                     |Valid Values                               |Purpose                                                        |
 |-------                            |--------                                   |---------------                                                |
 |AppDeployerLambdaFunctionArnParm   |A valid lambda function ARN.               |The deployer lambda function that will subscribe to SNS messages.|
 
 ## Deployer Lambda template
 The Deployer Lambda template describes the AWS lambda function that waits for deployables to be uploaded to the artifact S3 bucket and then deployed to EC2. The code for these lambda functions is packaged and stored in a publicly accessible read-only bucket owned by FastUp. 
+
 |Parameter Name                             |Valid Values                               |Purpose                                                        |
 |-------                                    |--------                                   |---------------                                                |
 |LambdaFunctionExecutionRoleParam           |A valid IAM role ARN.                      |This IAM role is used as a service role for the Lambda function.                      |
@@ -152,7 +158,10 @@ The Deployer Lambda template describes the AWS lambda function that waits for de
 
 
 # Why use FastUp
- 
+FastUp enables organizations to automate the software release management process with minimal disruptions to ongoing operations. The typical release process consists of listed phases: 1) System Architecture, 2) Release Process Design, 3) Deployment, 4) Testing, 5) Maintenance. FastUp attempts to provide canned solutions to the System Architecture and Release Process Design phases, automates Deployment and facilitates Maintenance. Testing of releases is upto using organizations by any familiar means. Here is a brief description of each phases and how FastUp automates each.
+## System Architecture
+During the system architecture phase, an organization gets to consider Non Functional Requirements (NFR) of the system and design a system that can handle such NFRs. NFRs may include requirements such as security, performance, cost, availability and disaster recovery amongst many others. 
+How FastUp Automates
     
 
 [//]: # (This is a lot like how elastic beanstalk from AWS works, except that, elastic beanstalk still requires manual inputs either on the console or via the elastic beanstalk api. Elastic beanstalk does not include RDS within it's applications and environments. Further, elasticbeanstalk, does not offer integration between multiple applications. If an enterprise has multiple applications dependent on each other, each application should be managed independently. Finally, elastic beanstalk does not allow architects to customize its platform. Rightly so, elastic beanstalk is a platform as a service offering from AWS and it's main benefit is that developers need not architect the system and can focus purely on developing the application. This works in many cases, but, can fall short if all requirements cannot be met in this offering.)
