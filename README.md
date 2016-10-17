@@ -7,11 +7,7 @@
 - [Use case narrative](#use-case-narrative)
 - [Usage](#usage)
   - [Make Infrastructure](#make-infrastructure)
-    - [Purpose](#purpose)
-    - [Configuration options](#configuration-options)
   - [Deploy Application](#deploy-application)
-    - [Purpose](#purpose-1)
-    - [Configuration options](#configuration-options-1)
 - [Diagrams](#diagrams)
   - [VPC](#vpc)
   - [Autoscaling](#autoscaling)
@@ -25,6 +21,7 @@
   - [IAM template](#iam-template)
   - [Messaging template](#messaging-template)
   - [Deployer Lambda template](#deployer-lambda-template)
+- [Why use FastUp](#why-use-fastup)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -55,9 +52,9 @@ On the 6 month anniversary, Dilton's new UI was ready. Archie, Betty and Chuck w
 As of version 0.1.2, the FastUp software is available as a maven plugin in maven central. There are two main named maven goals that developers can configure. One named `make-base-infrastructure` creates a new VPC, subnets, IAM roles, policies and buckets for use with FastUp. The other, named `deploy-app`, hooks into the deploy phase of a war file project and uploads the war file with certain metadata to the S3 bucket from the first goal. It is possible to configure the `deploy-app` goal with pre-existing AWS resources so that developers can re-use their existing resources such as VPC, iam roles, buckets etc. Please see the sample project for a detailed example of configuring a war file project.
 The plugin also supports a third goal, the standard maven `help:describe` goal. This prints out all available configuration options and meanings of each option.
 ## Make Infrastructure
-### Purpose
-The `make-base-infrastructure` maven goal creates all required infrastructure resources such as networks, IAM roles, lambda functions, internet gateways and nat gateways amongst other resources. For a full listing of resources look at the [base infrastructure template](/src/main/cloudformation/base/main.template).
-### Configuration options
+- Purpose
+The `make-base-infrastructure` maven goal creates all required infrastructure resources such as networks, IAM roles, lambda functions, internet gateways and nat gateways amongst other resources. For a full listing of resources look at the [base infrastructure template](fastup-maven-plugin/src/main/cloudformation/main.template).
+- Configuration options
 |Option                         |Required/Default   |Valid values                                                                       |Purpose                                                                         |
 |------------------------------ |------------       |--------------------------------------                                             |--------------------------------------------------------------------------------|
 |availability-zones             |                   |Comma separated availability zone names from AWS. Examples: us-east-1a,us-east-1b  |FastUp creates a new all subnets in the provided availability zones.|
@@ -66,9 +63,9 @@ The `make-base-infrastructure` maven goal creates all required infrastructure re
 |aws-auth-profile               |                   |A profile name that is configured on the host running fastup maven plugin.         |To authenticate against AWS in order to run cloudformation templates|
 
 ## Deploy Application
-### Purpose
+- Purpose
 The `deploy-app` maven goal uploads the war file created in the standard maven deploy phase to the artifact bucket in S3. S3 triggers an event that executes a lambda function that deploys the uploaded war file.
-### Configuration options
+- Configuration options
 Some of these configuration options are stored as metadata on the S3 object that this plugin creates.
  
 |Option                         |Required/Default   |Valid values                                                                       |Purpose                                                                         |
@@ -158,11 +155,7 @@ The Deployer Lambda template describes the AWS lambda function that waits for de
 
 
 # Why use FastUp
-FastUp enables organizations to automate the software release management process with minimal disruptions to ongoing operations. The typical release process consists of listed phases: 1) System Architecture, 2) Release Process Design, 3) Deployment, 4) Testing, 5) Maintenance. FastUp attempts to provide canned solutions to the System Architecture and Release Process Design phases, automates Deployment and facilitates Maintenance. Testing of releases is upto using organizations by any familiar means. Here is a brief description of each phases and how FastUp automates each.
-## System Architecture
-During the system architecture phase, an organization gets to consider Non Functional Requirements (NFR) of the system and design a system that can handle such NFRs. NFRs may include requirements such as security, performance, cost, availability and disaster recovery amongst many others. 
-How FastUp Automates
-    
+FastUp enables organizations to automate the software release management process with minimal disruptions to operations. FastUp is a technical product to be implemented and maintained by the IT organization, however, FastUp is eventually beneficial for the entity that uses the software. Such entity could be an individual, another business or internal business partners. Traditional IT processes may require a significant effort and coordination on multiple fronts and may require down time of software. Additionally, each change also carries a significant burden of testing, review and approvals by entities that may not be final users of the system. For example, a business department head may be asked to approve specific changes to a system based on their understanding of customers wants and needs. Such understanding may come from data or experience, but, may be inadvertently substituted by anecdotal evidence. This type of burden disables the organization from offering better products and new features to customers. FastUp reduces or eliminates the burden of software changes and hence allows software development organizations to meet customer demands at a faster rate, before alternatives satisfy the demand.
 
-[//]: # (This is a lot like how elastic beanstalk from AWS works, except that, elastic beanstalk still requires manual inputs either on the console or via the elastic beanstalk api. Elastic beanstalk does not include RDS within it's applications and environments. Further, elasticbeanstalk, does not offer integration between multiple applications. If an enterprise has multiple applications dependent on each other, each application should be managed independently. Finally, elastic beanstalk does not allow architects to customize its platform. Rightly so, elastic beanstalk is a platform as a service offering from AWS and it's main benefit is that developers need not architect the system and can focus purely on developing the application. This works in many cases, but, can fall short if all requirements cannot be met in this offering.)
+
 
