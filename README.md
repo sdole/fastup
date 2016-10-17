@@ -55,6 +55,7 @@ The plugin also supports a third goal, the standard maven `help:describe` goal. 
 - Purpose
 The `make-base-infrastructure` maven goal creates all required infrastructure resources such as networks, IAM roles, lambda functions, internet gateways and nat gateways amongst other resources. For a full listing of resources look at the [base infrastructure template](fastup-maven-plugin/src/main/cloudformation/main.template).
 - Configuration options
+
 |Option                         |Required/Default   |Valid values                                                                       |Purpose                                                                         |
 |------------------------------ |------------       |--------------------------------------                                             |--------------------------------------------------------------------------------|
 |availability-zones             |                   |Comma separated availability zone names from AWS. Examples: us-east-1a,us-east-1b  |FastUp creates a new all subnets in the provided availability zones.|
