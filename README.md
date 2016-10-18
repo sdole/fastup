@@ -161,7 +161,7 @@ Traditional IT processes may require a significant effort and coordination on mu
 <img src="docs/img/traditional_it_process.png"/>
 <img src="docs/img/proposed_it_process.png"/>
 
-FastUp reduces or eliminates the burden of software changes and hence allows software development organizations to meet customer demands at a faster rate, before alternatives satisfy the demand. FastUp encourages IT organizations to flip the development process on its head by relying on frequent customer feedback and greatly reduce time to market. FastUp encourages customers to adopt the truly realize some of the more popular promises of software development methodologies.
+FastUp reduces or eliminates the burden of software changes and hence allows software development organizations to meet customer demands at a faster rate, before alternatives satisfy the demand. FastUp encourages IT organizations to flip the development process on its head by relying on frequent customer feedback and greatly reduce time to market. FastUp encourages customers to truly realize some of the more popular promises of software development methodologies.
   
 
 
