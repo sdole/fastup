@@ -174,7 +174,9 @@ FastUp is designed only for Amazon Web Services. It is a great fit for organizat
 Commercial support is available via www.fastup.com. Commercial support provides additional benefits such as ensuring best practice adoption, managed services contracts and continual updates specific to your organization.
  
 # FastUp and Micro-services 
-FastUp is a tool created for IT organizations. Micro-services<sup>[5][5],[6][6]</sup> is a collection of design and architecture principles that are used by developers to realize functionality.  
+FastUp is a tool created for IT organizations. Micro-services<sup>[5][5],[6][6]</sup> is a collection of design and architecture principles that are used by developers to realize functionality. FastUp is built around the premise that aggregate functionality should be delivered by multiple very small applications that each deliver a specific sliver of funtinoality. Scaling, Re-sizing, changes and other operational activities on individual small applications should not affect the aggregate functionality. FastUp can be used just as easily to deploy a single monolothic application<sup>[7][7],[8][8]</sup> as it can be to deploy micro-services. 
+ 
+
 
 
 
@@ -184,5 +186,7 @@ FastUp is a tool created for IT organizations. Micro-services<sup>[5][5],[6][6]<
 [4]: https://www.forrester.com/report/Microservices+Have+An+Important+Role+In+The+Future+Of+Solution+Architecture/-/E-RES123031 
 [5]: http://www.martinfowler.com/articles/microservices.html 
 [6]: https://en.wikipedia.org/wiki/Microservices 
+[7]: http://microservices.io/patterns/monolithic.html 
+[8]: https://en.wikipedia.org/wiki/Monolithic_application
 
 
