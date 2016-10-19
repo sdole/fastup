@@ -156,15 +156,33 @@ The Deployer Lambda template describes the AWS lambda function that waits for de
 
 
 # Why use FastUp
+## Automation
 FastUp enables organizations to automate the software release management process with minimal disruptions to operations. FastUp is a technical product to be implemented and maintained by the IT organization, however, FastUp is eventually beneficial for the entity that uses the software. Such entity could be an individual, another business or internal business partners. 
 Traditional IT processes may require a significant effort and coordination on multiple fronts and may require down time of software<sup>[1][1]</sup><sup>,</sup><sup>[2][2]</sup>. Additionally, each change also carries a significant burden of testing, review and approvals by entities that may not be final users of the system. For example, a business department head may be asked to approve specific changes to a system based on their understanding of customers wants and needs. As another example, business analysts and testers who validate the system before a production release are only a proxy for final fitness for purpose. Not only is validation and approval by proxies an error prone process but it also consumes a large amount of time before customers can see the product. This type of burden disables the organization from offering better products and new features to customers.
 <img src="docs/img/traditional_it_process.png"/>
 <img src="docs/img/proposed_it_process.png"/>
 
 FastUp reduces or eliminates the burden of software changes and hence allows software development organizations to meet customer demands at a faster rate, before alternatives satisfy the demand. FastUp encourages IT organizations to flip the development process on its head by relying on frequent customer feedback and greatly reduce time to market. FastUp encourages customers to truly realize some of the more popular promises of software development methodologies.
+ 
+## Distributed Micro-Services Platform
+FastUp takes a specific position within the application development practice. It is built to work best with a distributed micro-service architecture using basic AWS products. A distributed micro-service architecture happens to be an important strategic way forward for Application Development and Delivery (AD&D) function<sup>[3][3]</sup><sup>,</sup><sup>[4][4]</sup>. FastUp is built with the philosophy that micro-services, which are small, completely independent software products, should be easy to construct and easy to destroy without impact to ongoing operations. FastUp promotes this by offering cutomizable templates for micro-services and automated deployment of such templates.
+   
+## AWS Native 
+FastUp is designed only for Amazon Web Services. It is a great fit for organizations that already use AWS and want to take the next step of automating releases. Other than adopting the principles and philosophies of releasing often and fast, there is no new technology to learn. Your existing AWS support will support all resources created via FastUp. Additional support for FastUp itself is available in the form of issues on this GitHub repository.
   
+## Commercial Support
+Commercial support is available via www.fastup.com. Commercial support provides additional benefits such as ensuring best practice adoption, managed services contracts and continual updates specific to your organization.
+ 
+# FastUp and Micro-services 
+FastUp is a tool created for IT organizations. Micro-services<sup>[5][6]</sup><sup>,</sup><sup>[6][7]</sup> is a collection of design and architecture principles that are used by developers to realize functionality.  
 
 
 
 [1]: https://www.forrester.com/report/Haste+Does+Not+Make+Waste+If+You+Improve+Your+Service+Delivery/-/E-RES118905
 [2]: https://www.forrester.com/report/Brief+Embrace+The+Need+For+Speed+To+Avoid+Ugly+DevOps+Practices/-/E-RES122277
+[3]: https://www.forrester.com/report/Application+Modernization+Service+By+Microservice/-/E-RES122550 
+[4]: https://www.forrester.com/report/Microservices+Have+An+Important+Role+In+The+Future+Of+Solution+Architecture/-/E-RES123031 
+[5]: http://www.martinfowler.com/articles/microservices.html 
+[6]: https://en.wikipedia.org/wiki/Microservices 
+
+
