@@ -174,7 +174,7 @@ FastUp is designed only for Amazon Web Services. It is a great fit for organizat
 Commercial support is available via www.fastup.com. Commercial support provides additional benefits such as ensuring best practice adoption, managed services contracts and continual updates specific to your organization.
  
 # FastUp and Micro-services 
-FastUp is a tool created for IT organizations. Micro-services<sup>[5][6]</sup><sup>,</sup><sup>[6][7]</sup> is a collection of design and architecture principles that are used by developers to realize functionality.  
+FastUp is a tool created for IT organizations. Micro-services<sup>[6][6],[6][7]</sup> is a collection of design and architecture principles that are used by developers to realize functionality.  
 
 
 
