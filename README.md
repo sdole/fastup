@@ -22,6 +22,11 @@
   - [Messaging template](#messaging-template)
   - [Deployer Lambda template](#deployer-lambda-template)
 - [Why use FastUp](#why-use-fastup)
+  - [Automation](#automation)
+  - [Distributed Micro-Services Platform](#distributed-micro-services-platform)
+  - [AWS Native](#aws-native)
+  - [Commercial Support](#commercial-support)
+- [FastUp and Micro-services](#fastup-and-micro-services)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
